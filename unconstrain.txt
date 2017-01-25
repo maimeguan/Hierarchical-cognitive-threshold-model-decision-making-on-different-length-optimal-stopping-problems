@@ -1,0 +1,84 @@
+# Unconstrained, saturated threshold model
+# Data is from Burns et al. (2006), two tasks (5-point and 10-point problems)
+
+model{
+	for (i in 1:nsubj){
+	
+        alpha5[i] ~ dbeta(1, 1)		# accuracy of execution parameter
+        
+		tau5[i,1] ~ dunif(0, 100)	# each threshold tau is independent
+		tau5[i,2] ~ dunif(0, 100)
+		tau5[i,3] ~ dunif(0, 100)
+		tau5[i,4] ~ dunif(0, 100)
+		tau5[i,5] <- 0	
+		
+		for (j in 1:nprob){				# checks if current stimulus is maximal and above threshold
+			for (k in 1:nstim5){
+					above5[i,j,k] <- step(stim5[i,j,k]-tau5[i,k])
+			}
+			
+			# threshold choice model, pick first stimulus that is BOTH the highest so far AND above their threshold
+			intmp5[i,j,1] <- above5[i,j,1]
+			intmp5[i,j,2] <- 2*above5[i,j,2]*biggest5[i,j,2]*equals(intmp5[i,j,1],0)
+			intmp5[i,j,3] <- 3*above5[i,j,3]*biggest5[i,j,3]*equals(intmp5[i,j,1],0)*equals(intmp5[i,j,2],0)
+			intmp5[i,j,4] <- 4*above5[i,j,4]*biggest5[i,j,4]*equals(intmp5[i,j,1],0)*equals(intmp5[i,j,2],0)*equals(intmp5[i,j,3],0)
+			ind5[i,j] <- sum(intmp5[i,j,1:4])+ 5*equals(sum(intmp5[i,j,1:4]),0)
+			
+			for (k in 1:nstim5){
+			prob5[i,j,k] <- equals(ind5[i,j],k)*alpha5[i] + (1-equals(ind5[i,j],k))*(1-alpha5[i])/4			# matrix of decisions
+			}
+			
+			predy5[i,j] ~ dcat(prob5[i,j,1:nstim5])
+			y5[i,j] ~ dcat(prob5[i,j,1:nstim5])
+		}
+	}
+	
+	for (i in 1:nsubj){
+	
+        alpha10[i] ~ dbeta(1, 1)
+        
+		tau10[i,1] ~ dunif(0, 100)
+		tau10[i,2] ~ dunif(0, 100)
+		tau10[i,3] ~ dunif(0, 100)
+		tau10[i,4] ~ dunif(0, 100)
+		tau10[i,5] ~ dunif(0, 100)
+		tau10[i,6] ~ dunif(0, 100)
+		tau10[i,7] ~ dunif(0, 100)
+		tau10[i,8] ~ dunif(0, 100)
+		tau10[i,9] ~ dunif(0, 100)
+		tau10[i,10] <- 0	
+		
+		for (j in 1:nprob){				# checks if current stimulus is maximal and above threshold
+			for (k in 1:nstim10){
+					above10[i,j,k] <- step(stim10[i,j,k]-tau10[i,k])
+			}
+			
+			# threshold choice model, pick first stimulus that is BOTH the highest so far AND above their threshold
+			indtmp[i,j,1] <- above10[i,j,1]
+			indtmp[i,j,2] <- 2*above10[i,j,2]*biggest10[i,j,2]*equals(indtmp[i,j,1],0)
+			indtmp[i,j,3] <- 3*above10[i,j,3]*biggest10[i,j,3]*equals(indtmp[i,j,1],0)*equals(indtmp[i,j,2],0)
+			indtmp[i,j,4] <- 4*above10[i,j,4]*biggest10[i,j,4]*equals(indtmp[i,j,1],0)*equals(indtmp[i,j,2],0)*equals(indtmp[i,j,3],0)
+			indtmp[i,j,5] <- 5*above10[i,j,5]*biggest10[i,j,5]*equals(indtmp[i,j,1],0)*equals(indtmp[i,j,2],0)*equals(indtmp[i,j,3],0)
+								*equals(indtmp[i,j,4],0)
+			indtmp[i,j,6] <- 6*above10[i,j,6]*biggest10[i,j,6]*equals(indtmp[i,j,1],0)*equals(indtmp[i,j,2],0)*equals(indtmp[i,j,3],0)
+								*equals(indtmp[i,j,4],0)*equals(indtmp[i,j,5],0)
+			indtmp[i,j,7] <- 7*above10[i,j,7]*biggest10[i,j,7]*equals(indtmp[i,j,1],0)*equals(indtmp[i,j,2],0)*equals(indtmp[i,j,3],0)
+								*equals(indtmp[i,j,4],0)*equals(indtmp[i,j,5],0)*equals(indtmp[i,j,6],0)
+			indtmp[i,j,8] <- 8*above10[i,j,8]*biggest10[i,j,8]*equals(indtmp[i,j,1],0)*equals(indtmp[i,j,2],0)*equals(indtmp[i,j,3],0)
+								*equals(indtmp[i,j,4],0)*equals(indtmp[i,j,5],0)*equals(indtmp[i,j,6],0)*equals(indtmp[i,j,7],0)
+			indtmp[i,j,9] <- 9*above10[i,j,9]*biggest10[i,j,9]*equals(indtmp[i,j,1],0)*equals(indtmp[i,j,2],0)*equals(indtmp[i,j,3],0)
+								*equals(indtmp[i,j,4],0)*equals(indtmp[i,j,5],0)*equals(indtmp[i,j,6],0)*equals(indtmp[i,j,7],0)
+								*equals(indtmp[i,j,8],0)													
+			ind[i,j] <- sum(indtmp[i,j,1:9])+ 10*equals(sum(indtmp[i,j,1:9]),0)
+			
+			for (k in 1:nstim10){
+			prob10[i,j,k] <- equals(ind[i,j],k)*alpha10[i] + (1-equals(ind[i,j],k))*(1-alpha10[i])/9			# matrix of decisions
+			}
+			
+			predy10[i,j] ~ dcat(prob10[i,j,1:nstim10])
+			y10[i,j] ~ dcat(prob10[i,j,1:nstim10])
+		}
+	}
+	
+
+}
